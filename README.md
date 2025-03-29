@@ -1,3 +1,31 @@
+# LinguFlix
+
+## Configuración del Entorno
+
+1. Copia el archivo `.env.example` a `.env.local`:
+```bash
+cp .env.example .env.local
+```
+
+2. Actualiza las variables de entorno en `.env.local` con tus credenciales de Firebase:
+```
+NEXT_PUBLIC_FIREBASE_API_KEY=
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=
+NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=
+NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=
+NEXT_PUBLIC_FIREBASE_APP_ID=
+```
+
+⚠️ IMPORTANTE: Nunca subas el archivo `.env.local` a GitHub, ya que contiene información sensible.
+
+## Desarrollo
+
+```bash
+npm install
+npm run dev
+```
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started

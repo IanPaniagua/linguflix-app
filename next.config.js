@@ -7,6 +7,11 @@ const nextConfig = {
         hostname: 'images.unsplash.com',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'firebasestorage.googleapis.com',
+        pathname: '/**',
+      }
     ],
     formats: ['image/webp'],
     minimumCacheTTL: 2678400, // 31 days

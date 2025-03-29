@@ -2,10 +2,11 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { doc, getDoc, setDoc, updateDoc, collection } from 'firebase/firestore'
+import { doc, getDoc, setDoc, updateDoc, collection, DocumentData } from 'firebase/firestore'
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
-import { db, storage } from '@/lib/firebase'
+import { db, storage, auth } from '@/lib/firebase'
 import { PlusCircle, X, Save } from 'lucide-react'
+import { signInWithPopup, GoogleAuthProvider } from 'firebase/auth'
 
 interface TopicData {
   title: string
@@ -42,15 +43,43 @@ const emptyTopic: TopicData = {
 
 export default function TopicPage({ params }: { params: { id: string } }) {
   const router = useRouter()
-  const isNew = params.id === 'new'
   const [topic, setTopic] = useState<TopicData>(emptyTopic)
-  const [loading, setLoading] = useState(!isNew)
+  const [loading, setLoading] = useState(true)
+  const [user, setUser] = useState(auth.currentUser)
 
   useEffect(() => {
-    if (!isNew) {
-      fetchTopic()
+    // Check if user is already signed in
+    if (!user) {
+      const signIn = async () => {
+        try {
+          const provider = new GoogleAuthProvider()
+          const result = await signInWithPopup(auth, provider)
+          setUser(result.user)
+        } catch (error) {
+          console.error('Error signing in:', error)
+          router.push('/admin') // Redirect if auth fails
+        }
+      }
+      signIn()
     }
-  }, [isNew])
+
+    // Listen for auth state changes
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      setUser(user)
+      if (!user) {
+        router.push('/admin') // Redirect if user signs out
+      }
+    })
+
+    // Fetch topic data if not new
+    if (params.id !== 'new') {
+      fetchTopic()
+    } else {
+      setLoading(false)
+    }
+
+    return () => unsubscribe()
+  }, [params.id, router])
 
   const fetchTopic = async () => {
     try {
@@ -68,25 +97,59 @@ export default function TopicPage({ params }: { params: { id: string } }) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     try {
-      if (isNew) {
-        const docRef = doc(collection(db, 'topics'))
-        await setDoc(docRef, {...topic} as any)
+      const topicData: DocumentData = {
+        title: topic.title,
+        description: topic.description,
+        level: topic.level,
+        video: topic.video,
+        phrases: topic.phrases,
+        vocabulary: topic.vocabulary,
+        updatedAt: new Date().toISOString()
+      }
+
+      if (params.id === 'new') {
+        const topicsRef = collection(db, 'topics')
+        const newDocRef = doc(topicsRef)
+        await setDoc(newDocRef, topicData)
+        console.log('New topic created successfully')
       } else {
-        await updateDoc(doc(db, 'topics', params.id), {...topic} as any)
+        const topicRef = doc(db, 'topics', params.id)
+        await updateDoc(topicRef, topicData)
+        console.log('Topic updated successfully')
       }
       router.push('/admin')
     } catch (error) {
       console.error('Error saving topic:', error)
+      alert('Error saving topic. Please try again.')
     }
   }
 
   const handleFileUpload = async (file: File, type: 'audio' | 'image') => {
     try {
-      const storageRef = ref(storage, `${type}s/${file.name}`)
-      await uploadBytes(storageRef, file)
-      return await getDownloadURL(storageRef)
+      if (!user) {
+        throw new Error('You must be signed in to upload files')
+      }
+
+      const timestamp = Date.now()
+      const safeFileName = file.name.replace(/[^a-zA-Z0-9.]/g, '_')
+      const fileName = `${type}s/${timestamp}-${safeFileName}`
+      const storageRef = ref(storage, fileName)
+      
+      console.log('Uploading file:', fileName)
+      const snapshot = await uploadBytes(storageRef, file)
+      console.log('File uploaded successfully:', snapshot.ref.fullPath)
+      
+      const downloadURL = await getDownloadURL(snapshot.ref)
+      console.log('File URL:', downloadURL)
+      
+      return downloadURL
     } catch (error) {
       console.error('Error uploading file:', error)
+      if (error instanceof Error) {
+        alert(`Error uploading ${type}: ${error.message}`)
+      } else {
+        alert(`Error uploading ${type}. Please try again.`)
+      }
       return ''
     }
   }
@@ -143,7 +206,7 @@ export default function TopicPage({ params }: { params: { id: string } }) {
     <form onSubmit={handleSubmit} className="space-y-8">
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold text-primary">
-          {isNew ? 'Create New Topic' : 'Edit Topic'}
+          {params.id === 'new' ? 'Create New Topic' : 'Edit Topic'}
         </h1>
         <button
           type="submit"
@@ -157,31 +220,31 @@ export default function TopicPage({ params }: { params: { id: string } }) {
       {/* Basic Information */}
       <div className="space-y-4">
         <div>
-          <label className="block text-sm font-medium mb-1">Title</label>
+          <label className="block text-sm font-medium text-primary mb-1">Title</label>
           <input
             type="text"
             value={topic.title}
             onChange={(e) => setTopic({ ...topic, title: e.target.value })}
-            className="w-full px-3 py-2 bg-secondary/50 rounded-md border border-white/5"
+            className="w-full px-3 py-2 bg-secondary/50 rounded-md border border-white/5 text-primary"
             required
           />
         </div>
         <div>
-          <label className="block text-sm font-medium mb-1">Description</label>
+          <label className="block text-sm font-medium text-primary mb-1">Description</label>
           <textarea
             value={topic.description}
             onChange={(e) => setTopic({ ...topic, description: e.target.value })}
-            className="w-full px-3 py-2 bg-secondary/50 rounded-md border border-white/5"
+            className="w-full px-3 py-2 bg-secondary/50 rounded-md border border-white/5 text-primary"
             rows={3}
             required
           />
         </div>
         <div>
-          <label className="block text-sm font-medium mb-1">Level</label>
+          <label className="block text-sm font-medium text-primary mb-1">Level</label>
           <select
             value={topic.level}
             onChange={(e) => setTopic({ ...topic, level: e.target.value as TopicData['level'] })}
-            className="w-full px-3 py-2 bg-secondary/50 rounded-md border border-white/5"
+            className="w-full px-3 py-2 bg-secondary/50 rounded-md border border-white/5 text-primary"
             required
           >
             <option value="basic">Basic</option>
@@ -193,24 +256,24 @@ export default function TopicPage({ params }: { params: { id: string } }) {
 
       {/* Video Section */}
       <div className="space-y-4">
-        <h2 className="text-xl font-semibold">Video</h2>
+        <h2 className="text-xl font-semibold text-primary">Video</h2>
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium mb-1">Type</label>
+            <label className="block text-sm font-medium text-primary mb-1">Type</label>
             <select
               value={topic.video.type}
               onChange={(e) => setTopic({
                 ...topic,
                 video: { ...topic.video, type: e.target.value as 'youtube' | 'local' }
               })}
-              className="w-full px-3 py-2 bg-secondary/50 rounded-md border border-white/5"
+              className="w-full px-3 py-2 bg-secondary/50 rounded-md border border-white/5 text-primary"
             >
               <option value="youtube">YouTube</option>
               <option value="local">Local File</option>
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1">URL</label>
+            <label className="block text-sm font-medium text-primary mb-1">URL</label>
             <input
               type="text"
               value={topic.video.url}
@@ -218,7 +281,7 @@ export default function TopicPage({ params }: { params: { id: string } }) {
                 ...topic,
                 video: { ...topic.video, url: e.target.value }
               })}
-              className="w-full px-3 py-2 bg-secondary/50 rounded-md border border-white/5"
+              className="w-full px-3 py-2 bg-secondary/50 rounded-md border border-white/5 text-primary"
               required
             />
           </div>
@@ -228,7 +291,7 @@ export default function TopicPage({ params }: { params: { id: string } }) {
       {/* Phrases Section */}
       <div className="space-y-4">
         <div className="flex justify-between items-center">
-          <h2 className="text-xl font-semibold">Phrases</h2>
+          <h2 className="text-xl font-semibold text-primary">Phrases</h2>
           <button
             type="button"
             onClick={addPhrase}
@@ -249,27 +312,27 @@ export default function TopicPage({ params }: { params: { id: string } }) {
                 <X className="w-4 h-4" />
               </button>
               <div>
-                <label className="block text-sm font-medium mb-1">German</label>
+                <label className="block text-sm font-medium text-primary mb-1">German</label>
                 <input
                   type="text"
                   value={phrase.german}
                   onChange={(e) => updatePhrase(index, 'german', e.target.value)}
-                  className="w-full px-3 py-2 bg-secondary/50 rounded-md border border-white/5"
+                  className="w-full px-3 py-2 bg-secondary/50 rounded-md border border-white/5 text-primary"
                   required
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Spanish</label>
+                <label className="block text-sm font-medium text-primary mb-1">Spanish</label>
                 <input
                   type="text"
                   value={phrase.spanish}
                   onChange={(e) => updatePhrase(index, 'spanish', e.target.value)}
-                  className="w-full px-3 py-2 bg-secondary/50 rounded-md border border-white/5"
+                  className="w-full px-3 py-2 bg-secondary/50 rounded-md border border-white/5 text-primary"
                   required
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Audio</label>
+                <label className="block text-sm font-medium text-primary mb-1">Audio</label>
                 <input
                   type="file"
                   accept="audio/*"
@@ -277,15 +340,20 @@ export default function TopicPage({ params }: { params: { id: string } }) {
                     const file = e.target.files?.[0]
                     if (file) {
                       const url = await handleFileUpload(file, 'audio')
-                      updatePhrase(index, 'audio', url)
+                      if (url) {
+                        updatePhrase(index, 'audio', url)
+                      }
                     }
                   }}
-                  className="w-full px-3 py-2 bg-secondary/50 rounded-md border border-white/5"
+                  className="w-full px-3 py-2 bg-secondary/50 rounded-md border border-white/5 text-primary"
                 />
                 {phrase.audio && (
-                  <audio controls className="mt-2 w-full">
-                    <source src={phrase.audio} type="audio/mpeg" />
-                  </audio>
+                  <div className="mt-2 space-y-2">
+                    <audio controls className="w-full">
+                      <source src={phrase.audio} type="audio/mpeg" />
+                    </audio>
+                    <p className="text-xs text-primary/60 break-all">{phrase.audio}</p>
+                  </div>
                 )}
               </div>
             </div>
@@ -296,7 +364,7 @@ export default function TopicPage({ params }: { params: { id: string } }) {
       {/* Vocabulary Section */}
       <div className="space-y-4">
         <div className="flex justify-between items-center">
-          <h2 className="text-xl font-semibold">Vocabulary</h2>
+          <h2 className="text-xl font-semibold text-primary">Vocabulary</h2>
           <button
             type="button"
             onClick={addVocabulary}
@@ -317,21 +385,21 @@ export default function TopicPage({ params }: { params: { id: string } }) {
                 <X className="w-4 h-4" />
               </button>
               <div>
-                <label className="block text-sm font-medium mb-1">Word</label>
+                <label className="block text-sm font-medium text-primary mb-1">Word</label>
                 <input
                   type="text"
                   value={word.word}
                   onChange={(e) => updateVocabulary(index, 'word', e.target.value)}
-                  className="w-full px-3 py-2 bg-secondary/50 rounded-md border border-white/5"
+                  className="w-full px-3 py-2 bg-secondary/50 rounded-md border border-white/5 text-primary"
                   required
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Article</label>
+                <label className="block text-sm font-medium text-primary mb-1">Article</label>
                 <select
                   value={word.article}
                   onChange={(e) => updateVocabulary(index, 'article', e.target.value)}
-                  className="w-full px-3 py-2 bg-secondary/50 rounded-md border border-white/5"
+                  className="w-full px-3 py-2 bg-secondary/50 rounded-md border border-white/5 text-primary"
                   required
                 >
                   <option value="">Select...</option>
@@ -341,7 +409,7 @@ export default function TopicPage({ params }: { params: { id: string } }) {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Image</label>
+                <label className="block text-sm font-medium text-primary mb-1">Image</label>
                 <input
                   type="file"
                   accept="image/*"
@@ -349,21 +417,26 @@ export default function TopicPage({ params }: { params: { id: string } }) {
                     const file = e.target.files?.[0]
                     if (file) {
                       const url = await handleFileUpload(file, 'image')
-                      updateVocabulary(index, 'image', url)
+                      if (url) {
+                        updateVocabulary(index, 'image', url)
+                      }
                     }
                   }}
-                  className="w-full px-3 py-2 bg-secondary/50 rounded-md border border-white/5"
+                  className="w-full px-3 py-2 bg-secondary/50 rounded-md border border-white/5 text-primary"
                 />
                 {word.image && (
-                  <img
-                    src={word.image}
-                    alt={word.word}
-                    className="mt-2 w-full h-32 object-cover rounded-md"
-                  />
+                  <div className="mt-2 space-y-2">
+                    <img
+                      src={word.image}
+                      alt={word.word}
+                      className="w-full h-32 object-cover rounded-md"
+                    />
+                    <p className="text-xs text-primary/60 break-all">{word.image}</p>
+                  </div>
                 )}
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Audio</label>
+                <label className="block text-sm font-medium text-primary mb-1">Audio</label>
                 <input
                   type="file"
                   accept="audio/*"
@@ -371,15 +444,20 @@ export default function TopicPage({ params }: { params: { id: string } }) {
                     const file = e.target.files?.[0]
                     if (file) {
                       const url = await handleFileUpload(file, 'audio')
-                      updateVocabulary(index, 'audio', url)
+                      if (url) {
+                        updateVocabulary(index, 'audio', url)
+                      }
                     }
                   }}
-                  className="w-full px-3 py-2 bg-secondary/50 rounded-md border border-white/5"
+                  className="w-full px-3 py-2 bg-secondary/50 rounded-md border border-white/5 text-primary"
                 />
                 {word.audio && (
-                  <audio controls className="mt-2 w-full">
-                    <source src={word.audio} type="audio/mpeg" />
-                  </audio>
+                  <div className="mt-2 space-y-2">
+                    <audio controls className="w-full">
+                      <source src={word.audio} type="audio/mpeg" />
+                    </audio>
+                    <p className="text-xs text-primary/60 break-all">{word.audio}</p>
+                  </div>
                 )}
               </div>
             </div>
