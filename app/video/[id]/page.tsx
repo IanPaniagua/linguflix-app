@@ -97,24 +97,32 @@ export default function VideoPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-black">
-        <Header />
-        <main className="container mx-auto px-4 pt-24">
-          <div className="flex items-center justify-center h-64">
-            <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-[oklch(0.623_0.214_259.815)]"></div>
-          </div>
-        </main>
+      <div className="min-h-screen relative">
+        <div className="fixed inset-0 bg-[url('/image/bg-universe.png')] bg-cover bg-center" />
+        <div className="fixed inset-0 bg-black/60" />
+        <div className="relative">
+          <Header />
+          <main className="container mx-auto px-4 pt-24">
+            <div className="flex items-center justify-center h-64">
+              <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-[oklch(0.623_0.214_259.815)]"></div>
+            </div>
+          </main>
+        </div>
       </div>
     )
   }
 
   if (!videoData) {
     return (
-      <div className="min-h-screen bg-black">
-        <Header />
-        <main className="container mx-auto px-4 pt-24">
-          <h1 className="text-2xl font-bold text-white">Video no encontrado</h1>
-        </main>
+      <div className="min-h-screen relative">
+        <div className="fixed inset-0 bg-[url('/image/bg-universe.png')] bg-cover bg-center" />
+        <div className="fixed inset-0 bg-black/60" />
+        <div className="relative">
+          <Header />
+          <main className="container mx-auto px-4 pt-24">
+            <h1 className="text-2xl font-bold text-white">Video no encontrado</h1>
+          </main>
+        </div>
       </div>
     )
   }
@@ -141,95 +149,99 @@ export default function VideoPage() {
   }
 
   return (
-    <div className="min-h-screen bg-black">
-      <Header />
-      
-      {/* Video Player Section */}
-      <main className="container mx-auto px-4 pt-24">
-        <div className="max-w-4xl mx-auto">
-          <h1 className="text-3xl font-bold mb-6 text-white">{videoData.title}</h1>
-        </div>
-        <div className="aspect-video w-full max-w-4xl mx-auto bg-black rounded-lg overflow-hidden shadow-2xl ring-1 ring-white/10">
-          <VideoPlayer />
-        </div>
-
-        {/* Listen & Repeat Section */}
-        <section className="mt-12 max-w-4xl mx-auto">
-          <h2 className="text-2xl font-bold mb-6 text-white">Escucha y Repite</h2>
-          <div className="space-y-4">
-            {videoData.phrases.map((phrase, index) => (
-              <div 
-                key={index} 
-                className="bg-white/10 p-4 rounded-lg border border-white/5 hover:bg-white/20 transition-colors"
-              >
-                <div className="flex items-center justify-between">
-                  <p className="text-lg font-medium text-white">{phrase.german}</p>
-                  {phrase.audio && phrase.audio.trim() !== '' && (
-                    <button
-                      onClick={() => playAudio(phrase.audio)}
-                      className={`p-2 rounded-full transition-colors ${
-                        isPlaying === phrase.audio 
-                          ? 'bg-[oklch(0.623_0.214_259.815)]/20 text-[oklch(0.623_0.214_259.815)]' 
-                          : 'hover:bg-[oklch(0.623_0.214_259.815)]/20 text-[oklch(0.623_0.214_259.815)]/80'
-                      }`}
-                      title={isPlaying === phrase.audio ? "Stop audio" : "Play audio"}
-                    >
-                      <Volume2 className="w-6 h-6" />
-                    </button>
-                  )}
-                </div>
-                <p className="text-gray-300 mt-2">{phrase.spanish}</p>
-              </div>
-            ))}
+    <div className="min-h-screen relative">
+      <div className="fixed inset-0 bg-[url('/image/bg-universe.png')] bg-cover bg-center" />
+      <div className="fixed inset-0 bg-black/60" />
+      <div className="relative">
+        <Header />
+        
+        {/* Video Player Section */}
+        <main className="container mx-auto px-4 pt-24">
+          <div className="max-w-4xl mx-auto">
+            <h1 className="text-3xl font-bold mb-6 text-white">{videoData.title}</h1>
           </div>
-        </section>
+          <div className="aspect-video w-full max-w-4xl mx-auto bg-black rounded-lg overflow-hidden shadow-2xl ring-1 ring-white/10">
+            <VideoPlayer />
+          </div>
 
-        {/* Vocabulary Section */}
-        <section className="mt-12 max-w-4xl mx-auto pb-12">
-          <h2 className="text-2xl font-bold mb-6 text-white">Vocabulario</h2>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {videoData.vocabulary.map((item, index) => (
-              <div 
-                key={index} 
-                className="bg-white/10 rounded-lg overflow-hidden border border-white/5 hover:bg-white/20 transition-colors"
-              >
-                {item.image && item.image.trim() !== '' && (
-                  <div className="relative aspect-square bg-black/50">
-                    <Image
-                      src={item.image}
-                      alt={item.word}
-                      fill
-                      sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
-                      className="object-cover opacity-90 hover:opacity-100 transition-opacity"
-                      priority={index < 4}
-                    />
-                  </div>
-                )}
-                <div className="p-3">
+          {/* Listen & Repeat Section */}
+          <section className="mt-12 max-w-4xl mx-auto">
+            <h2 className="text-2xl font-bold mb-6 text-white">Escucha y Repite</h2>
+            <div className="space-y-4">
+              {videoData.phrases.map((phrase, index) => (
+                <div 
+                  key={index} 
+                  className="bg-white/10 p-4 rounded-lg border border-white/5 hover:bg-white/20 transition-colors"
+                >
                   <div className="flex items-center justify-between">
-                    <p className="font-medium text-white">
-                      <span className="text-white/80">{item.article}</span> {item.word}
-                    </p>
-                    {item.audio && item.audio.trim() !== '' && (
+                    <p className="text-lg font-medium text-white">{phrase.german}</p>
+                    {phrase.audio && phrase.audio.trim() !== '' && (
                       <button
-                        onClick={() => playAudio(item.audio)}
-                        className={`p-1.5 rounded-full transition-colors ${
-                          isPlaying === item.audio 
+                        onClick={() => playAudio(phrase.audio)}
+                        className={`p-2 rounded-full transition-colors ${
+                          isPlaying === phrase.audio 
                             ? 'bg-[oklch(0.623_0.214_259.815)]/20 text-[oklch(0.623_0.214_259.815)]' 
                             : 'hover:bg-[oklch(0.623_0.214_259.815)]/20 text-[oklch(0.623_0.214_259.815)]/80'
                         }`}
-                        title={isPlaying === item.audio ? "Stop audio" : "Play audio"}
+                        title={isPlaying === phrase.audio ? "Stop audio" : "Play audio"}
                       >
-                        <Volume2 className="w-5 h-5" />
+                        <Volume2 className="w-6 h-6" />
                       </button>
                     )}
                   </div>
+                  <p className="text-gray-300 mt-2">{phrase.spanish}</p>
                 </div>
-              </div>
-            ))}
-          </div>
-        </section>
-      </main>
+              ))}
+            </div>
+          </section>
+
+          {/* Vocabulary Section */}
+          <section className="mt-12 max-w-4xl mx-auto pb-12">
+            <h2 className="text-2xl font-bold mb-6 text-white">Vocabulario</h2>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {videoData.vocabulary.map((item, index) => (
+                <div 
+                  key={index} 
+                  className="bg-white/10 rounded-lg overflow-hidden border border-white/5 hover:bg-white/20 transition-colors"
+                >
+                  {item.image && item.image.trim() !== '' && (
+                    <div className="relative aspect-square bg-black/50">
+                      <Image
+                        src={item.image}
+                        alt={item.word}
+                        fill
+                        sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
+                        className="object-cover opacity-90 hover:opacity-100 transition-opacity"
+                        priority={index < 4}
+                      />
+                    </div>
+                  )}
+                  <div className="p-3">
+                    <div className="flex items-center justify-between">
+                      <p className="font-medium text-white">
+                        <span className="text-white/80">{item.article}</span> {item.word}
+                      </p>
+                      {item.audio && item.audio.trim() !== '' && (
+                        <button
+                          onClick={() => playAudio(item.audio)}
+                          className={`p-1.5 rounded-full transition-colors ${
+                            isPlaying === item.audio 
+                              ? 'bg-[oklch(0.623_0.214_259.815)]/20 text-[oklch(0.623_0.214_259.815)]' 
+                              : 'hover:bg-[oklch(0.623_0.214_259.815)]/20 text-[oklch(0.623_0.214_259.815)]/80'
+                          }`}
+                          title={isPlaying === item.audio ? "Stop audio" : "Play audio"}
+                        >
+                          <Volume2 className="w-5 h-5" />
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+        </main>
+      </div>
     </div>
   )
 } 

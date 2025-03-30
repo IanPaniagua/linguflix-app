@@ -98,65 +98,69 @@ export default function Home() {
   const advancedTopics = topics.filter(topic => topic.level === 'advanced')
 
   return (
-    <div className="flex flex-col min-h-screen overflow-x-hidden">
-      <Header />
+    <div className="flex flex-col min-h-screen overflow-x-hidden relative">
+      <div className="fixed inset-0 bg-[url('/image/bg-universe.png')] bg-cover bg-center" />
+      <div className="fixed inset-0 bg-black/60" />
+      <div className="relative">
+        <Header />
       
-      {/* Hero Section */}
-      <section className="relative w-full min-h-[90vh] flex items-center justify-center overflow-hidden">
-        <div className="absolute inset-0">
-          <video
-            autoPlay
-            muted
-            loop
-            playsInline
-            poster="https://images.unsplash.com/photo-1534972195531-d756b9bfa9f2?auto=format&fit=crop"
-            className="absolute inset-0 w-full h-full object-cover"
-          >
-            <source src="/video/Earth_countries.mp4" type="video/mp4" />
-          </video>
-          <div className="absolute inset-0 bg-black/40" />
-        </div>
-        
-        <div className="container relative mx-auto px-4 py-20 md:py-32">
-          <div className="max-w-3xl space-y-6">
-            <h1 className="text-4xl md:text-6xl font-bold tracking-tight">
-              Learn languages <br />
-              through Immersive <br />
-              Videos
-            </h1>
-            {/* <p className="text-lg md:text-xl text-muted-foreground max-w-2xl">
-              Master German naturally with our curated collection of real-life scenario videos,
-              perfect for every skill level.
-            </p> */}
-            <Button size="lg" className="bg-primary hover:bg-primary/90">
-              Start Learning
-            </Button>
+        {/* Hero Section */}
+        <section className="relative w-full min-h-[90vh] flex items-center justify-center overflow-hidden">
+          <div className="absolute inset-0">
+            <video
+              autoPlay
+              muted
+              loop
+              playsInline
+              poster="https://images.unsplash.com/photo-1534972195531-d756b9bfa9f2?auto=format&fit=crop"
+              className="absolute inset-0 w-full h-full object-cover"
+            >
+              <source src="/video/Earth_countries.mp4" type="video/mp4" />
+            </video>
+            <div className="absolute inset-0 bg-black/40" />
           </div>
-        </div>
-      </section>
-
-      {/* Video Sections */}
-      <main className="flex-1 w-full">
-        <div className="space-y-2">
-          {loading ? (
-            <div className="flex items-center justify-center h-64">
-              <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-primary"></div>
+          
+          <div className="container relative mx-auto px-4 py-20 md:py-32">
+            <div className="max-w-3xl space-y-6">
+              <h1 className="text-4xl md:text-6xl font-bold tracking-tight">
+                Learn languages <br />
+                through Immersive <br />
+                Videos
+              </h1>
+              {/* <p className="text-lg md:text-xl text-muted-foreground max-w-2xl">
+                Master German naturally with our curated collection of real-life scenario videos,
+                perfect for every skill level.
+              </p> */}
+              <Button size="lg" className="bg-primary hover:bg-primary/90">
+                Start Learning
+              </Button>
             </div>
-          ) : (
-            <>
-              {basicTopics.length > 0 && (
-                <VideoRow title="Basic Level - Start Your Journey" topics={basicTopics} />
-              )}
-              {intermediateTopics.length > 0 && (
-                <VideoRow title="Intermediate Level - Build Confidence" topics={intermediateTopics} />
-              )}
-              {advancedTopics.length > 0 && (
-                <VideoRow title="Advanced Level - Master German" topics={advancedTopics} />
-              )}
-            </>
-          )}
-        </div>
-      </main>
+          </div>
+        </section>
+
+        {/* Video Sections */}
+        <main className="flex-1 w-full">
+          <div className="space-y-2">
+            {loading ? (
+              <div className="flex items-center justify-center h-64">
+                <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-primary"></div>
+              </div>
+            ) : (
+              <>
+                {basicTopics.length > 0 && (
+                  <VideoRow title="Basic Level - Start Your Journey" topics={basicTopics} />
+                )}
+                {intermediateTopics.length > 0 && (
+                  <VideoRow title="Intermediate Level - Build Confidence" topics={intermediateTopics} />
+                )}
+                {advancedTopics.length > 0 && (
+                  <VideoRow title="Advanced Level - Master German" topics={advancedTopics} />
+                )}
+              </>
+            )}
+          </div>
+        </main>
+      </div>
     </div>
   )
 }
