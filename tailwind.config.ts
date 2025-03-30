@@ -18,6 +18,11 @@ const config: Config = {
           lighter: '#181818',
           light: '#222222',
         },
+        sword: {
+          DEFAULT: '#E8E9EB',
+          muted: '#C8C9CB',
+          glow: '0 0 3px rgba(255,255,255,0.3)',
+        },
       },
       spacing: {
         '128': '32rem',

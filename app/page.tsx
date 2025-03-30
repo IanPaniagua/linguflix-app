@@ -33,9 +33,9 @@ interface Topic {
 function VideoRow({ title, topics }: { title: string; topics: Topic[] }) {
   return (
     <div className="space-y-4 pt-4">
-      <h2 className="text-2xl font-semibold text-white">{title}</h2>
+      <h2 className="text-2xl font-semibold text-[#E8E9EB] drop-shadow-[0_0_3px_rgba(255,255,255,0.3)]">{title}</h2>
       <div className="relative">
-        <div className="flex space-x-4 overflow-x-auto pb-4 text-white">
+        <div className="flex space-x-4 overflow-x-auto pb-4">
           {topics.map((topic, index) => (
             <Link 
               key={topic.id} 
@@ -53,10 +53,10 @@ function VideoRow({ title, topics }: { title: string; topics: Topic[] }) {
                   priority={index < 4}
                 />
                 <div className="absolute bottom-0 left-0 right-0 p-4 z-20">
-                  <h3 className="text-lg font-medium text-white">
+                  <h3 className="text-lg font-medium text-[#E8E9EB] drop-shadow-[0_0_3px_rgba(255,255,255,0.3)]">
                     {topic.title}
                   </h3>
-                  <p className="text-sm text-gray-300 line-clamp-2">
+                  <p className="text-sm text-[#C8C9CB] line-clamp-2">
                     {topic.description}
                   </p>
                 </div>

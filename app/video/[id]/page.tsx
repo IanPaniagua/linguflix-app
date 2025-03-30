@@ -120,7 +120,7 @@ export default function VideoPage() {
         <div className="relative">
           <Header />
           <main className="container mx-auto px-4 pt-24">
-            <h1 className="text-2xl font-bold text-white">Video no encontrado</h1>
+            <h1 className="text-2xl font-bold text-[#E8E9EB] drop-shadow-[0_0_3px_rgba(255,255,255,0.3)]">Video no encontrado</h1>
           </main>
         </div>
       </div>
@@ -158,7 +158,7 @@ export default function VideoPage() {
         {/* Video Player Section */}
         <main className="container mx-auto px-4 pt-24">
           <div className="max-w-4xl mx-auto">
-            <h1 className="text-3xl font-bold mb-6 text-white">{videoData.title}</h1>
+            <h1 className="text-3xl font-bold mb-6 text-sword drop-shadow-[var(--sword-glow)]">{videoData.title}</h1>
           </div>
           <div className="aspect-video w-full max-w-4xl mx-auto bg-black rounded-lg overflow-hidden shadow-2xl ring-1 ring-white/10">
             <VideoPlayer />
@@ -166,7 +166,7 @@ export default function VideoPage() {
 
           {/* Listen & Repeat Section */}
           <section className="mt-12 max-w-4xl mx-auto">
-            <h2 className="text-2xl font-bold mb-6 text-white">Escucha y Repite</h2>
+            <h2 className="text-2xl font-bold mb-6 text-sword drop-shadow-[var(--sword-glow)]">Escucha y Repite</h2>
             <div className="space-y-4">
               {videoData.phrases.map((phrase, index) => (
                 <div 
@@ -197,7 +197,7 @@ export default function VideoPage() {
 
           {/* Vocabulary Section */}
           <section className="mt-12 max-w-4xl mx-auto pb-12">
-            <h2 className="text-2xl font-bold mb-6 text-white">Vocabulario</h2>
+            <h2 className="text-2xl font-bold mb-6 text-sword drop-shadow-[var(--sword-glow)]">Vocabulario</h2>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
               {videoData.vocabulary.map((item, index) => (
                 <div 
