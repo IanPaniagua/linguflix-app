@@ -97,11 +97,11 @@ export default function VideoPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-black">
         <Header />
         <main className="container mx-auto px-4 pt-24">
           <div className="flex items-center justify-center h-64">
-            <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-primary"></div>
+            <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-[oklch(0.623_0.214_259.815)]"></div>
           </div>
         </main>
       </div>
@@ -110,10 +110,10 @@ export default function VideoPage() {
 
   if (!videoData) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-black">
         <Header />
         <main className="container mx-auto px-4 pt-24">
-          <h1 className="text-2xl font-bold text-primary">Video no encontrado</h1>
+          <h1 className="text-2xl font-bold text-white">Video no encontrado</h1>
         </main>
       </div>
     )
@@ -141,13 +141,13 @@ export default function VideoPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-black">
       <Header />
       
       {/* Video Player Section */}
       <main className="container mx-auto px-4 pt-24">
         <div className="max-w-4xl mx-auto">
-          <h1 className="text-3xl font-bold mb-6 text-primary">{videoData.title}</h1>
+          <h1 className="text-3xl font-bold mb-6 text-white">{videoData.title}</h1>
         </div>
         <div className="aspect-video w-full max-w-4xl mx-auto bg-black rounded-lg overflow-hidden shadow-2xl ring-1 ring-white/10">
           <VideoPlayer />
@@ -155,22 +155,22 @@ export default function VideoPage() {
 
         {/* Listen & Repeat Section */}
         <section className="mt-12 max-w-4xl mx-auto">
-          <h2 className="text-2xl font-bold mb-6 text-primary/90">Escucha y Repite</h2>
+          <h2 className="text-2xl font-bold mb-6 text-white">Escucha y Repite</h2>
           <div className="space-y-4">
             {videoData.phrases.map((phrase, index) => (
               <div 
                 key={index} 
-                className="bg-secondary/50 p-4 rounded-lg border border-white/5 hover:bg-secondary/80 transition-colors"
+                className="bg-white/10 p-4 rounded-lg border border-white/5 hover:bg-white/20 transition-colors"
               >
                 <div className="flex items-center justify-between">
-                  <p className="text-lg font-medium text-primary">{phrase.german}</p>
+                  <p className="text-lg font-medium text-white">{phrase.german}</p>
                   {phrase.audio && phrase.audio.trim() !== '' && (
                     <button
                       onClick={() => playAudio(phrase.audio)}
                       className={`p-2 rounded-full transition-colors ${
                         isPlaying === phrase.audio 
-                          ? 'bg-primary/20 text-primary' 
-                          : 'hover:bg-primary/20 text-primary/80'
+                          ? 'bg-[oklch(0.623_0.214_259.815)]/20 text-[oklch(0.623_0.214_259.815)]' 
+                          : 'hover:bg-[oklch(0.623_0.214_259.815)]/20 text-[oklch(0.623_0.214_259.815)]/80'
                       }`}
                       title={isPlaying === phrase.audio ? "Stop audio" : "Play audio"}
                     >
@@ -178,7 +178,7 @@ export default function VideoPage() {
                     </button>
                   )}
                 </div>
-                <p className="text-gray-400 mt-2">{phrase.spanish}</p>
+                <p className="text-gray-300 mt-2">{phrase.spanish}</p>
               </div>
             ))}
           </div>
@@ -186,12 +186,12 @@ export default function VideoPage() {
 
         {/* Vocabulary Section */}
         <section className="mt-12 max-w-4xl mx-auto pb-12">
-          <h2 className="text-2xl font-bold mb-6 text-primary/90">Vocabulario</h2>
+          <h2 className="text-2xl font-bold mb-6 text-white">Vocabulario</h2>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {videoData.vocabulary.map((item, index) => (
               <div 
                 key={index} 
-                className="bg-secondary/50 rounded-lg overflow-hidden border border-white/5 hover:bg-secondary/80 transition-colors"
+                className="bg-white/10 rounded-lg overflow-hidden border border-white/5 hover:bg-white/20 transition-colors"
               >
                 {item.image && item.image.trim() !== '' && (
                   <div className="relative aspect-square bg-black/50">
@@ -207,16 +207,16 @@ export default function VideoPage() {
                 )}
                 <div className="p-3">
                   <div className="flex items-center justify-between">
-                    <p className="font-medium text-primary">
-                      <span className="text-primary/80">{item.article}</span> {item.word}
+                    <p className="font-medium text-white">
+                      <span className="text-white/80">{item.article}</span> {item.word}
                     </p>
                     {item.audio && item.audio.trim() !== '' && (
                       <button
                         onClick={() => playAudio(item.audio)}
                         className={`p-1.5 rounded-full transition-colors ${
                           isPlaying === item.audio 
-                            ? 'bg-primary/20 text-primary' 
-                            : 'hover:bg-primary/20 text-primary/80'
+                            ? 'bg-[oklch(0.623_0.214_259.815)]/20 text-[oklch(0.623_0.214_259.815)]' 
+                            : 'hover:bg-[oklch(0.623_0.214_259.815)]/20 text-[oklch(0.623_0.214_259.815)]/80'
                         }`}
                         title={isPlaying === item.audio ? "Stop audio" : "Play audio"}
                       >

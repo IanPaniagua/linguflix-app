@@ -32,10 +32,10 @@ interface Topic {
 
 function VideoRow({ title, topics }: { title: string; topics: Topic[] }) {
   return (
-    <div className="space-y-4">
-      <h2 className="text-2xl font-semibold text-primary">{title}</h2>
+    <div className="space-y-4 pt-4">
+      <h2 className="text-2xl font-semibold text-white">{title}</h2>
       <div className="relative">
-        <div className="flex space-x-4 overflow-x-auto pb-4">
+        <div className="flex space-x-4 overflow-x-auto pb-4 text-white">
           {topics.map((topic, index) => (
             <Link 
               key={topic.id} 
@@ -53,7 +53,7 @@ function VideoRow({ title, topics }: { title: string; topics: Topic[] }) {
                   priority={index < 4}
                 />
                 <div className="absolute bottom-0 left-0 right-0 p-4 z-20">
-                  <h3 className="text-lg font-medium text-white group-hover:text-primary transition-colors">
+                  <h3 className="text-lg font-medium text-white">
                     {topic.title}
                   </h3>
                   <p className="text-sm text-gray-300 line-clamp-2">
