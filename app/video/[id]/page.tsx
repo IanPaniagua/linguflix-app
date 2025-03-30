@@ -129,7 +129,31 @@ export default function VideoPage() {
 
   const VideoPlayer = () => {
     if (videoData.video.type === 'youtube') {
-      const videoId = videoData.video.url.split('v=')[1]?.split('&')[0] || ''
+      let videoId = ''
+      const url = videoData.video.url
+      
+      // Handle different YouTube URL formats
+      if (url.includes('youtu.be/')) {
+        // Handle short URLs like https://youtu.be/VIDEO_ID
+        videoId = url.split('youtu.be/')[1]?.split('?')[0] || ''
+      } else if (url.includes('youtube.com/watch')) {
+        // Handle full URLs like https://www.youtube.com/watch?v=VIDEO_ID
+        const urlParams = new URLSearchParams(url.split('?')[1])
+        videoId = urlParams.get('v') || ''
+      } else if (url.includes('youtube.com/embed/')) {
+        // Handle embed URLs like https://www.youtube.com/embed/VIDEO_ID
+        videoId = url.split('embed/')[1]?.split('?')[0] || ''
+      }
+
+      if (!videoId) {
+        console.error('Invalid YouTube URL:', url)
+        return (
+          <div className="w-full h-full flex items-center justify-center bg-black/50 text-white">
+            <p>Error: URL de YouTube inválida</p>
+          </div>
+        )
+      }
+
       return (
         <iframe
           src={`https://www.youtube.com/embed/${videoId}`}
