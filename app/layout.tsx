@@ -6,7 +6,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "LinguFlix - Learn German through Videos",
+  title: "LinguFlix - Learn languages through Immersive Videos",
   description: "Master German naturally with immersive video content",
 };
 

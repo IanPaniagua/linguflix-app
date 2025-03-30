@@ -6,7 +6,6 @@ import { db } from '@/lib/firebase'
 import Image from 'next/image'
 import Link from 'next/link'
 import Header from '@/components/Header'
-import VideoRow from '@/components/VideoRow'
 import { Button } from '@/components/ui/button'
 
 interface Topic {
@@ -103,21 +102,32 @@ export default function Home() {
       <Header />
       
       {/* Hero Section */}
-      <section className="relative w-full min-h-[90vh] flex items-center justify-center">
-        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1534972195531-d756b9bfa9f2?auto=format&fit=crop')] bg-cover bg-center">
-          <div className="absolute inset-0 bg-gradient-to-b from-background/80 via-background/50 to-background" />
+      <section className="relative w-full min-h-[90vh] flex items-center justify-center overflow-hidden">
+        <div className="absolute inset-0">
+          <video
+            autoPlay
+            muted
+            loop
+            playsInline
+            poster="https://images.unsplash.com/photo-1534972195531-d756b9bfa9f2?auto=format&fit=crop"
+            className="absolute inset-0 w-full h-full object-cover"
+          >
+            <source src="/video/Earth_countries.mp4" type="video/mp4" />
+          </video>
+          <div className="absolute inset-0 bg-black/40" />
         </div>
         
         <div className="container relative mx-auto px-4 py-20 md:py-32">
           <div className="max-w-3xl space-y-6">
             <h1 className="text-4xl md:text-6xl font-bold tracking-tight">
-              Learn German through
-              <span className="text-primary"> Immersive Videos</span>
+              Learn languages <br />
+              through Immersive <br />
+              Videos
             </h1>
-            <p className="text-lg md:text-xl text-muted-foreground max-w-2xl">
+            {/* <p className="text-lg md:text-xl text-muted-foreground max-w-2xl">
               Master German naturally with our curated collection of real-life scenario videos,
               perfect for every skill level.
-            </p>
+            </p> */}
             <Button size="lg" className="bg-primary hover:bg-primary/90">
               Start Learning
             </Button>

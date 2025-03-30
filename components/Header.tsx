@@ -17,7 +17,7 @@ export default function Header() {
   const { user, signInWithGoogle, logout } = useAuth()
 
   return (
-    <header className="fixed w-full z-50 bg-background/80 backdrop-blur-sm border-b border-border/40">
+    <header className="fixed w-full z-50 bg-background/30 backdrop-blur-[2px] border-b border-border/20">
       <div className="container flex h-16 items-center justify-between px-4">
         <Link href="/" className="flex items-center space-x-2">
           <span className="text-2xl font-bold text-primary">LinguFlix</span>
