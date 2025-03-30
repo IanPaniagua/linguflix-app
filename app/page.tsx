@@ -117,7 +117,8 @@ export default function Home() {
             >
               <source src="/video/Earth_countries.mp4" type="video/mp4" />
             </video>
-            <div className="absolute inset-0 bg-black/40" />
+            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/20 to-black/70" />
+            <div className="absolute bottom-0 left-0 right-0 h-48 bg-gradient-to-t from-black to-transparent backdrop-blur-[2px]" />
           </div>
           
           <div className="container relative mx-auto px-4 py-20 md:py-32">
