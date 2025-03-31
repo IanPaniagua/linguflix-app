@@ -44,7 +44,22 @@ const emptyTopic: TopicData = {
   thumbnail: ''
 }
 
-export default function TopicPage({ params }: { params: { id: string } }) {
+interface PageParams {
+  id: string
+}
+
+interface Props {
+  params: PageParams
+}
+
+// Configuramos la revalidación cada 60 segundos
+export const revalidate = 60
+
+// Permitimos parámetros dinámicos
+export const dynamicParams = true
+
+export default function TopicPage({ params }: Props) {
+  const { id } = params
   const router = useRouter()
   const [topic, setTopic] = useState<TopicData>(emptyTopic)
   const [loading, setLoading] = useState(true)
@@ -74,28 +89,29 @@ export default function TopicPage({ params }: { params: { id: string } }) {
       }
     })
 
+    // Define fetchTopic inside useEffect
+    const fetchTopic = async () => {
+      try {
+        const topicDoc = await getDoc(doc(db, 'topics', id))
+        if (topicDoc.exists()) {
+          setTopic(topicDoc.data() as TopicData)
+        }
+      } catch (error) {
+        console.error('Error fetching topic:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
     // Fetch topic data if not new
-    if (params.id !== 'new') {
+    if (id !== 'new') {
       fetchTopic()
     } else {
       setLoading(false)
     }
 
     return () => unsubscribe()
-  }, [params.id, router])
-
-  const fetchTopic = async () => {
-    try {
-      const topicDoc = await getDoc(doc(db, 'topics', params.id))
-      if (topicDoc.exists()) {
-        setTopic(topicDoc.data() as TopicData)
-      }
-    } catch (error) {
-      console.error('Error fetching topic:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
+  }, [id, router, user]) // Added user to dependencies
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -111,13 +127,13 @@ export default function TopicPage({ params }: { params: { id: string } }) {
         thumbnail: topic.thumbnail
       }
 
-      if (params.id === 'new') {
+      if (id === 'new') {
         const topicsRef = collection(db, 'topics')
         const newDocRef = doc(topicsRef)
         await setDoc(newDocRef, topicData)
         console.log('New topic created successfully')
       } else {
-        const topicRef = doc(db, 'topics', params.id)
+        const topicRef = doc(db, 'topics', id)
         await updateDoc(topicRef, topicData)
         console.log('Topic updated successfully')
       }
@@ -210,7 +226,7 @@ export default function TopicPage({ params }: { params: { id: string } }) {
     <form onSubmit={handleSubmit} className="space-y-8">
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold text-primary">
-          {params.id === 'new' ? 'Create New Topic' : 'Edit Topic'}
+          {id === 'new' ? 'Create New Topic' : 'Edit Topic'}
         </h1>
         <button
           type="submit"
