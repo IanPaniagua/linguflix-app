@@ -44,12 +44,11 @@ const emptyTopic: TopicData = {
   thumbnail: ''
 }
 
-interface PageParams {
-  id: string
-}
-
-interface Props {
-  params: PageParams
+type PageProps = {
+  params: {
+    id: string
+  }
+  searchParams?: Record<string, string | string[] | undefined>
 }
 
 // Configuramos la revalidación cada 60 segundos
@@ -58,7 +57,7 @@ export const revalidate = 60
 // Permitimos parámetros dinámicos
 export const dynamicParams = true
 
-export default function TopicPage({ params }: Props) {
+export default function TopicPage({ params }: PageProps) {
   const { id } = params
   const router = useRouter()
   const [topic, setTopic] = useState<TopicData>(emptyTopic)
