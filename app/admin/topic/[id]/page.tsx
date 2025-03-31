@@ -439,31 +439,67 @@ export default function TopicPage({ params }: { params: { id: string } }) {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-primary mb-1">Image</label>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={async (e) => {
-                    const file = e.target.files?.[0]
-                    if (file) {
-                      const url = await handleFileUpload(file, 'image')
-                      if (url) {
-                        updateVocabulary(index, 'image', url)
-                      }
-                    }
-                  }}
-                  className="w-full px-3 py-2 bg-secondary/50 rounded-md border border-white/5 text-primary"
-                />
-                {word.image && (
-                  <div className="mt-2 space-y-2">
-                    <img
-                      src={word.image}
-                      alt={word.word}
-                      className="w-full h-32 object-cover rounded-md"
-                    />
-                    <p className="text-xs text-primary/60 break-all">{word.image}</p>
+                <label className="block text-sm font-medium text-primary mb-1">Imagen</label>
+                <div className="space-y-2">
+                  <div className="flex gap-2">
+                    <select
+                      onChange={(e) => {
+                        if (e.target.value === 'url') {
+                          // Limpiar el input de archivo si cambiamos a URL
+                          const fileInput = document.getElementById(`vocab-file-${index}`) as HTMLInputElement
+                          if (fileInput) fileInput.value = ''
+                        }
+                      }}
+                      className="px-3 py-2 bg-secondary/50 rounded-md border border-white/5 text-primary"
+                    >
+                      <option value="file">Subir archivo</option>
+                      <option value="url">URL de Unsplash</option>
+                    </select>
                   </div>
-                )}
+
+                  {/* Input para archivo */}
+                  <input
+                    id={`vocab-file-${index}`}
+                    type="file"
+                    accept="image/*"
+                    onChange={async (e) => {
+                      const file = e.target.files?.[0]
+                      if (file) {
+                        const url = await handleFileUpload(file, 'image')
+                        if (url) {
+                          updateVocabulary(index, 'image', url)
+                        }
+                      }
+                    }}
+                    className="w-full px-3 py-2 bg-secondary/50 rounded-md border border-white/5 text-primary"
+                  />
+
+                  {/* Input para URL */}
+                  <input
+                    type="url"
+                    placeholder="https://images.unsplash.com/..."
+                    onChange={(e) => {
+                      if (e.target.value.includes('unsplash.com')) {
+                        updateVocabulary(index, 'image', e.target.value)
+                      } else {
+                        alert('Por favor, introduce una URL válida de Unsplash')
+                      }
+                    }}
+                    className="w-full px-3 py-2 bg-secondary/50 rounded-md border border-white/5 text-primary"
+                  />
+
+                  {/* Vista previa de la imagen */}
+                  {word.image && (
+                    <div className="mt-2 space-y-2">
+                      <img
+                        src={word.image}
+                        alt={word.word}
+                        className="w-full h-32 object-cover rounded-md"
+                      />
+                      <p className="text-xs text-primary/60 break-all">{word.image}</p>
+                    </div>
+                  )}
+                </div>
               </div>
               <div>
                 <label className="block text-sm font-medium text-primary mb-1">Audio</label>

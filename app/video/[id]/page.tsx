@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState } from 'react'
 import { doc, getDoc } from 'firebase/firestore'
 import { db } from '@/lib/firebase'
 import Header from '@/components/Header'
@@ -61,60 +61,75 @@ const VideoPlayer = React.memo(({ videoData }: { videoData: VideoData }) => {
     )
   }
 })
+VideoPlayer.displayName = 'VideoPlayer'
 
-const PhraseItem = React.memo(({ 
-  phrase, 
-  isPlaying, 
-  onPlayClick 
-}: { 
-  phrase: VideoData['phrases'][0],
-  isPlaying: boolean,
-  onPlayClick: () => void
-}) => {
+function AudioButton({ audioUrl, small = false }: { audioUrl: string; small?: boolean }) {
+  const [mounted, setMounted] = useState(false)
+  const [audio, setAudio] = useState<HTMLAudioElement | null>(null)
+  const [isPlaying, setIsPlaying] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+    const audioElement = new Audio()
+    audioElement.addEventListener('ended', () => setIsPlaying(false))
+    audioElement.addEventListener('error', () => setIsPlaying(false))
+    setAudio(audioElement)
+
+    return () => {
+      audioElement.removeEventListener('ended', () => setIsPlaying(false))
+      audioElement.removeEventListener('error', () => setIsPlaying(false))
+      audioElement.pause()
+    }
+  }, [])
+
+  if (!mounted) {
+    return (
+      <button
+        className={`${small ? 'p-1.5' : 'p-2'} rounded-full transition-colors hover:bg-[oklch(0.623_0.214_259.815)]/20 text-[oklch(0.623_0.214_259.815)]/80`}
+      >
+        <Volume2 className={`${small ? 'w-5 h-5' : 'w-6 h-6'}`} />
+      </button>
+    )
+  }
+
+  const toggleAudio = async () => {
+    if (!audio) return
+
+    try {
+      if (isPlaying) {
+        audio.pause()
+        setIsPlaying(false)
+      } else {
+        audio.src = audioUrl
+        await audio.play()
+        setIsPlaying(true)
+      }
+    } catch (error) {
+      console.error('Error playing audio:', error)
+      setIsPlaying(false)
+    }
+  }
+
   return (
-    <div className="bg-white/10 p-4 rounded-lg border border-white/5 hover:bg-white/20 transition-colors">
-      <div className="flex items-center justify-between">
-        <p className="text-lg font-medium text-white">{phrase.german}</p>
-        {phrase.audio && phrase.audio.trim() !== '' && (
-          <button
-            onClick={onPlayClick}
-            className={`p-2 rounded-full transition-colors ${
-              isPlaying 
-                ? 'bg-[oklch(0.623_0.214_259.815)]/20 text-[oklch(0.623_0.214_259.815)]' 
-                : 'hover:bg-[oklch(0.623_0.214_259.815)]/20 text-[oklch(0.623_0.214_259.815)]/80'
-            }`}
-            title={isPlaying ? "Stop audio" : "Play audio"}
-          >
-            <Volume2 className="w-6 h-6" />
-          </button>
-        )}
-      </div>
-      <p className="text-gray-300 mt-2">{phrase.spanish}</p>
-    </div>
+    <button
+      onClick={toggleAudio}
+      className={`${small ? 'p-1.5' : 'p-2'} rounded-full transition-colors ${
+        isPlaying 
+          ? 'bg-[oklch(0.623_0.214_259.815)]/20 text-[oklch(0.623_0.214_259.815)]' 
+          : 'hover:bg-[oklch(0.623_0.214_259.815)]/20 text-[oklch(0.623_0.214_259.815)]/80'
+      }`}
+      title={isPlaying ? "Stop audio" : "Play audio"}
+    >
+      <Volume2 className={`${small ? 'w-5 h-5' : 'w-6 h-6'}`} />
+    </button>
   )
-})
+}
 
 export default function VideoPage() {
   const params = useParams()
   const id = params.id as string
-  const [audio] = useState(() => new Audio())
-  const [playingAudioUrl, setPlayingAudioUrl] = useState<string | null>(null)
   const [videoData, setVideoData] = useState<VideoData | null>(null)
   const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    const handleAudioEnd = () => setPlayingAudioUrl(null)
-    const handleAudioError = () => setPlayingAudioUrl(null)
-    
-    audio.addEventListener('ended', handleAudioEnd)
-    audio.addEventListener('error', handleAudioError)
-
-    return () => {
-      audio.removeEventListener('ended', handleAudioEnd)
-      audio.removeEventListener('error', handleAudioError)
-      audio.pause()
-    }
-  }, [audio])
 
   useEffect(() => {
     const fetchVideoData = async () => {
@@ -124,7 +139,7 @@ export default function VideoPage() {
         
         if (docSnap.exists()) {
           const data = docSnap.data() as VideoData
-          console.log('Fetched data:', data) // Debug log
+          console.log('Fetched data:', data)
           setVideoData(data)
         }
       } catch (error) {
@@ -138,23 +153,6 @@ export default function VideoPage() {
       fetchVideoData()
     }
   }, [id])
-
-  const playAudio = useCallback(async (audioUrl: string) => {
-    try {
-      if (playingAudioUrl === audioUrl) {
-        audio.pause()
-        setPlayingAudioUrl(null)
-        return
-      }
-      
-      setPlayingAudioUrl(audioUrl)
-      audio.src = audioUrl
-      await audio.play()
-    } catch (error) {
-      console.error('Error playing audio:', error)
-      setPlayingAudioUrl(null)
-    }
-  }, [audio, playingAudioUrl])
 
   if (loading) {
     return (
@@ -214,17 +212,19 @@ export default function VideoPage() {
                 </h2>
                 <div className="space-y-4">
                   {videoData.phrases.map((phrase, index) => (
-                    <PhraseItem
-                      key={index}
-                      phrase={phrase}
-                      isPlaying={playingAudioUrl === phrase.audio}
-                      onPlayClick={() => playAudio(phrase.audio)}
-                    />
+                    <div key={index} className="bg-white/10 p-4 rounded-lg border border-white/5 hover:bg-white/20 transition-colors">
+                      <div className="flex items-center justify-between">
+                        <p className="text-lg font-medium text-white">{phrase.german}</p>
+                        {phrase.audio && phrase.audio.trim() !== '' && (
+                          <AudioButton audioUrl={phrase.audio} />
+                        )}
+                      </div>
+                      <p className="text-gray-300 mt-2">{phrase.spanish}</p>
+                    </div>
                   ))}
                 </div>
               </section>
 
-              {/* Vocabulary Section */}
               <section className="mt-12 max-w-4xl mx-auto pb-12">
                 <h2 className="text-2xl font-bold mb-6 text-sword drop-shadow-[var(--sword-glow)]">Vocabulario</h2>
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
@@ -251,17 +251,7 @@ export default function VideoPage() {
                             <span className="text-white/80">{item.article}</span> {item.word}
                           </p>
                           {item.audio && item.audio.trim() !== '' && (
-                            <button
-                              onClick={() => playAudio(item.audio)}
-                              className={`p-1.5 rounded-full transition-colors ${
-                                playingAudioUrl === item.audio 
-                                  ? 'bg-[oklch(0.623_0.214_259.815)]/20 text-[oklch(0.623_0.214_259.815)]' 
-                                  : 'hover:bg-[oklch(0.623_0.214_259.815)]/20 text-[oklch(0.623_0.214_259.815)]/80'
-                              }`}
-                              title={playingAudioUrl === item.audio ? "Stop audio" : "Play audio"}
-                            >
-                              <Volume2 className="w-5 h-5" />
-                            </button>
+                            <AudioButton audioUrl={item.audio} small />
                           )}
                         </div>
                       </div>
