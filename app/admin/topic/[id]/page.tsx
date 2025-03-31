@@ -1,17 +1,17 @@
+import { use } from 'react'
 import TopicForm from './TopicForm'
 
-// Definimos que params es una promesa según la documentación oficial
-type Params = Promise<{ id: string }>
+// Indicamos explícitamente que esto es una página de servidor
+export const dynamic = 'force-dynamic' 
+export const fetchCache = 'default-no-store'
 
-// Usamos un componente async para poder usar await
-export default async function Page({
-  params,
-}: {
-  params: Params
+// Seguimos la forma exacta de la documentación oficial
+export default function Page(props: {
+  params: Promise<{ id: string }>
 }) {
-  // Esperamos a que se resuelva la promesa de params
-  const resolvedParams = await params
-  const id = resolvedParams.id
+  // Usamos el hook 'use' para componentes síncronos
+  const params = use(props.params)
+  const id = params.id
   
   return <TopicForm id={id} />
 } 
