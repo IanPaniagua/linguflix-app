@@ -20,7 +20,8 @@ const nextConfig: NextConfig = {
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
   },
   typescript: {
-    ignoreBuildErrors: true, // Si decides usar esta opción
+    // Asegurarnos de que los errores de TypeScript no bloqueen la compilación
+    ignoreBuildErrors: true,
   },
 };
 

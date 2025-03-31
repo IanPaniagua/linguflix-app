@@ -4,9 +4,14 @@ import TopicForm from './TopicForm'
 export const dynamic = 'force-dynamic' 
 export const fetchCache = 'default-no-store'
 
-// Seguimos la forma exacta de la documentación oficial
-export default async function Page(props: { params: Promise<{ id: string }> }) {
-  const params = await props.params
+interface PageProps {
+  params: {
+    id: string
+  }
+}
+
+export default async function Page({ params }: PageProps) {
+  // Ya no necesitamos await params porque no es un Promise en la interfaz
   const id = params.id
   
   return <TopicForm id={id} />
