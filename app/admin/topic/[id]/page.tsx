@@ -27,6 +27,7 @@ interface TopicData {
     image: string
     audio: string
   }>
+  thumbnail: string
 }
 
 const emptyTopic: TopicData = {
@@ -38,7 +39,8 @@ const emptyTopic: TopicData = {
     url: ''
   },
   phrases: [],
-  vocabulary: []
+  vocabulary: [],
+  thumbnail: ''
 }
 
 export default function TopicPage({ params }: { params: { id: string } }) {
@@ -104,7 +106,8 @@ export default function TopicPage({ params }: { params: { id: string } }) {
         video: topic.video,
         phrases: topic.phrases,
         vocabulary: topic.vocabulary,
-        updatedAt: new Date().toISOString()
+        updatedAt: new Date().toISOString(),
+        thumbnail: topic.thumbnail
       }
 
       if (params.id === 'new') {
@@ -238,6 +241,33 @@ export default function TopicPage({ params }: { params: { id: string } }) {
             rows={3}
             required
           />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-primary mb-1">Imagen de Portada</label>
+          <input
+            type="file"
+            accept="image/*"
+            onChange={async (e) => {
+              const file = e.target.files?.[0]
+              if (file) {
+                const url = await handleFileUpload(file, 'image')
+                if (url) {
+                  setTopic({ ...topic, thumbnail: url })
+                }
+              }
+            }}
+            className="w-full px-3 py-2 bg-secondary/50 rounded-md border border-white/5 text-primary"
+          />
+          {topic.thumbnail && (
+            <div className="mt-2 space-y-2">
+              <img
+                src={topic.thumbnail}
+                alt="Imagen de portada"
+                className="w-full h-48 object-cover rounded-md"
+              />
+              <p className="text-xs text-primary/60 break-all">{topic.thumbnail}</p>
+            </div>
+          )}
         </div>
         <div>
           <label className="block text-sm font-medium text-primary mb-1">Level</label>

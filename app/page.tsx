@@ -13,6 +13,7 @@ interface Topic {
   title: string
   description: string
   level: 'basic' | 'intermediate' | 'advanced'
+  thumbnail: string
   video: {
     type: 'youtube' | 'local'
     url: string
@@ -45,7 +46,7 @@ function VideoRow({ title, topics }: { title: string; topics: Topic[] }) {
               <div className="aspect-video bg-secondary/50 rounded-lg overflow-hidden relative">
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent z-10" />
                 <Image
-                  src={topic.vocabulary[0]?.image || 'https://images.unsplash.com/photo-1557223562-6c77ef16210f'}
+                  src={topic.thumbnail || topic.vocabulary[0]?.image || 'https://images.unsplash.com/photo-1557223562-6c77ef16210f'}
                   alt={topic.title}
                   width={384}
                   height={216}
