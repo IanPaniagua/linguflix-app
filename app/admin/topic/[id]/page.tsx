@@ -1,5 +1,10 @@
 import TopicForm from './TopicForm'
 
-export default function Page({ params }: { params: { id: string } }) {
-  return <TopicForm id={params.id} />
+interface PageProps {
+  params: Promise<{ id: string }>
+}
+
+export default async function Page({ params }: PageProps) {
+  const { id } = await params
+  return <TopicForm id={id} />
 } 
