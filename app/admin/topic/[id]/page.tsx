@@ -7,6 +7,7 @@ import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
 import { db, storage, auth } from '@/lib/firebase'
 import { PlusCircle, X, Save } from 'lucide-react'
 import { signInWithPopup, GoogleAuthProvider } from 'firebase/auth'
+import Image from 'next/image'
 
 interface TopicData {
   title: string
@@ -260,10 +261,13 @@ export default function TopicPage({ params }: { params: { id: string } }) {
           />
           {topic.thumbnail && (
             <div className="mt-2 space-y-2">
-              <img
+              <Image
                 src={topic.thumbnail}
                 alt="Imagen de portada"
+                width={828}
+                height={315}
                 className="w-full h-48 object-cover rounded-md"
+                priority
               />
               <p className="text-xs text-primary/60 break-all">{topic.thumbnail}</p>
             </div>
@@ -491,9 +495,11 @@ export default function TopicPage({ params }: { params: { id: string } }) {
                   {/* Vista previa de la imagen */}
                   {word.image && (
                     <div className="mt-2 space-y-2">
-                      <img
+                      <Image
                         src={word.image}
                         alt={word.word}
+                        width={384}
+                        height={256}
                         className="w-full h-32 object-cover rounded-md"
                       />
                       <p className="text-xs text-primary/60 break-all">{word.image}</p>
