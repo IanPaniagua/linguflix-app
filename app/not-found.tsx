@@ -2,18 +2,18 @@ import Link from 'next/link'
 
 export default function NotFound() {
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-black text-white px-4">
-      <div className="fixed inset-0 bg-[url('/image/bg-universe.png')] bg-cover bg-center opacity-20" />
-      <div className="relative max-w-md mx-auto text-center space-y-6">
-        <h1 className="text-4xl font-bold">404 - Página no encontrada</h1>
-        <p className="text-xl">
-          Lo sentimos, la página que estás buscando no existe o ha sido movida.
+    <div className="min-h-screen flex items-center justify-center bg-background">
+      <div className="text-center space-y-6">
+        <h1 className="text-6xl font-bold text-primary">404</h1>
+        <h2 className="text-2xl font-semibold text-primary">Page Not Found</h2>
+        <p className="text-primary/60 max-w-md mx-auto">
+          The page you're looking for doesn't exist or has been moved.
         </p>
         <Link 
           href="/"
-          className="inline-block px-6 py-3 bg-primary text-white rounded-md hover:bg-primary/90 transition-colors"
+          className="inline-block px-6 py-3 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
         >
-          Volver al inicio
+          Return Home
         </Link>
       </div>
     </div>
