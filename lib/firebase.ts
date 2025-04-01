@@ -13,16 +13,24 @@ const firebaseConfig = {
 }
 
 // Initialize Firebase only on the client side
-let app;
-let db;
-let storage;
-let auth;
+let app = null
+let db = null
+let storage = null
+let auth = null
 
-if (typeof window !== 'undefined') {
-  app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
-  db = getFirestore(app);
-  storage = getStorage(app);
-  auth = getAuth(app);
+// Solo inicializamos Firebase si estamos en el navegador y tenemos todas las configuraciones necesarias
+if (typeof window !== 'undefined' && 
+    process.env.NEXT_PUBLIC_FIREBASE_API_KEY && 
+    process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN && 
+    process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID) {
+  try {
+    app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig)
+    db = getFirestore(app)
+    storage = getStorage(app)
+    auth = getAuth(app)
+  } catch (error) {
+    console.error('Error initializing Firebase:', error)
+  }
 }
 
 export { app, db, storage, auth } 

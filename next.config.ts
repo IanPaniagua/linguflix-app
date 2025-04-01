@@ -23,6 +23,10 @@ const nextConfig: NextConfig = {
     // Asegurarnos de que los errores de TypeScript no bloqueen la compilación
     ignoreBuildErrors: true,
   },
+  // Evitar que Next.js intente pre-renderizar páginas que usan Firebase
+  experimental: {
+    serverComponentsExternalPackages: ['firebase'],
+  },
 };
 
 export default nextConfig;
