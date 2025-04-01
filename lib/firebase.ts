@@ -1,4 +1,4 @@
-import { initializeApp } from 'firebase/app'
+import { initializeApp, getApps } from 'firebase/app'
 import { getFirestore } from 'firebase/firestore'
 import { getStorage } from 'firebase/storage'
 import { getAuth } from 'firebase/auth'
@@ -12,9 +12,17 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID
 }
 
-const app = initializeApp(firebaseConfig)
-const db = getFirestore(app)
-const storage = getStorage(app)
-const auth = getAuth(app)
+// Initialize Firebase only on the client side
+let app;
+let db;
+let storage;
+let auth;
+
+if (typeof window !== 'undefined' && !getApps().length) {
+  app = initializeApp(firebaseConfig);
+  db = getFirestore(app);
+  storage = getStorage(app);
+  auth = getAuth(app);
+}
 
 export { db, storage, auth } 

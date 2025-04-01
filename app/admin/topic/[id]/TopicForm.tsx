@@ -2,11 +2,11 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { doc, getDoc, setDoc, updateDoc, collection, DocumentData } from 'firebase/firestore'
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
+import { doc, getDoc, setDoc, updateDoc, collection, DocumentData, Firestore } from 'firebase/firestore'
+import { ref, uploadBytes, getDownloadURL, Storage } from 'firebase/storage'
 import { db, storage, auth } from '@/lib/firebase'
 import { PlusCircle, X, Save } from 'lucide-react'
-import { signInWithPopup, GoogleAuthProvider } from 'firebase/auth'
+import { signInWithPopup, GoogleAuthProvider, User, Auth } from 'firebase/auth'
 import Image from 'next/image'
 
 interface TopicData {
@@ -52,15 +52,30 @@ export default function TopicForm({ id }: TopicFormProps) {
   const router = useRouter()
   const [topic, setTopic] = useState<TopicData>(emptyTopic)
   const [loading, setLoading] = useState(true)
-  const [user, setUser] = useState(auth.currentUser)
+  const [user, setUser] = useState<User | null>(null)
 
   useEffect(() => {
+    // Check if we're in the browser
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    // Check if auth is available (client-side only)
+    if (!auth) {
+      console.error('Auth is not available');
+      router.push('/admin');
+      return;
+    }
+
+    // Set initial user state
+    setUser(auth.currentUser);
+    
     // Check if user is already signed in
-    if (!user) {
+    if (!auth.currentUser) {
       const signIn = async () => {
         try {
           const provider = new GoogleAuthProvider()
-          const result = await signInWithPopup(auth, provider)
+          const result = await signInWithPopup(auth as Auth, provider)
           setUser(result.user)
         } catch (error) {
           console.error('Error signing in:', error)
@@ -71,9 +86,9 @@ export default function TopicForm({ id }: TopicFormProps) {
     }
 
     // Listen for auth state changes
-    const unsubscribe = auth.onAuthStateChanged((user) => {
-      setUser(user)
-      if (!user) {
+    const unsubscribe = (auth as Auth).onAuthStateChanged((currentUser: User | null) => {
+      setUser(currentUser)
+      if (!currentUser) {
         router.push('/admin') // Redirect if user signs out
       }
     })
@@ -81,7 +96,11 @@ export default function TopicForm({ id }: TopicFormProps) {
     // Define fetchTopic inside useEffect
     const fetchTopic = async () => {
       try {
-        const topicDoc = await getDoc(doc(db, 'topics', id))
+        if (!db) {
+          throw new Error('Firestore is not available');
+        }
+        
+        const topicDoc = await getDoc(doc(db as Firestore, 'topics', id))
         if (topicDoc.exists()) {
           setTopic(topicDoc.data() as TopicData)
         }
@@ -99,8 +118,10 @@ export default function TopicForm({ id }: TopicFormProps) {
       setLoading(false)
     }
 
-    return () => unsubscribe()
-  }, [id, router, user])
+    return () => {
+      if (unsubscribe) unsubscribe()
+    }
+  }, [id, router])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
