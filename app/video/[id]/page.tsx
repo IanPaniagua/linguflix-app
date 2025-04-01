@@ -208,7 +208,7 @@ export default function VideoPage() {
 
               <section className="mt-12 max-w-4xl mx-auto">
                 <h2 className="text-2xl font-bold mb-6 text-sword drop-shadow-[var(--sword-glow)]">
-                  Now you can listen and repeat
+                  Listen and repeat
                 </h2>
                 <div className="space-y-4">
                   {videoData.phrases.map((phrase, index) => (
