@@ -6,7 +6,6 @@ import { db } from '@/lib/firebase'
 import Image from 'next/image'
 import Link from 'next/link'
 import Header from '@/components/Header'
-import { Button } from '@/components/ui/button'
 
 interface Topic {
   id: string
@@ -138,19 +137,12 @@ export default function Home() {
           </div>
           
           <div className="container relative mx-auto px-4 py-20 md:py-32">
-            <div className="max-w-3xl space-y-6">
+            <div className="max-w-3xl">
               <h1 className="text-4xl md:text-6xl font-bold tracking-tight">
                 Learn languages <br />
                 through Immersive <br />
                 Videos
               </h1>
-              {/* <p className="text-lg md:text-xl text-muted-foreground max-w-2xl">
-                Master German naturally with our curated collection of real-life scenario videos,
-                perfect for every skill level.
-              </p> */}
-              <Button size="lg" className="bg-primary hover:bg-primary/90">
-                Start Learning
-              </Button>
             </div>
           </div>
         </section>
