@@ -4,15 +4,10 @@ import TopicForm from './TopicForm'
 export const dynamic = 'force-dynamic' 
 export const fetchCache = 'default-no-store'
 
-type PageProps = {
-  params: Promise<{ id: string }>
-  searchParams: { [key: string]: string | string[] | undefined }
-}
-
-export default async function Page({ params }: PageProps) {
+export default async function Page(props: { params: Promise<{ id: string }> }) {
   // Asegurarnos de resolver el Promise de params
-  const resolvedParams = await params
-  const id = resolvedParams.id
+  const params = await props.params
+  const id = params.id
   
   return <TopicForm id={id} />
 } 
