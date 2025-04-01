@@ -3,6 +3,7 @@ import { getFirestore } from 'firebase/firestore'
 import { getStorage } from 'firebase/storage'
 import { getAuth } from 'firebase/auth'
 
+// Configuración de Firebase
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
   authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
@@ -13,23 +14,25 @@ const firebaseConfig = {
 }
 
 // Initialize Firebase only on the client side
-let app = null
-let db = null
-let storage = null
-let auth = null
+let app;
+let db;
+let storage;
+let auth;
 
-// Solo inicializamos Firebase si estamos en el navegador y tenemos todas las configuraciones necesarias
+// Verificar que estamos en el cliente y que las variables de entorno están disponibles
 if (typeof window !== 'undefined' && 
     process.env.NEXT_PUBLIC_FIREBASE_API_KEY && 
-    process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN && 
-    process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID) {
+    process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN) {
   try {
-    app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig)
-    db = getFirestore(app)
-    storage = getStorage(app)
-    auth = getAuth(app)
+    // Intentar inicializar Firebase
+    app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
+    db = getFirestore(app);
+    storage = getStorage(app);
+    auth = getAuth(app);
+    console.log("Firebase initialized successfully");
   } catch (error) {
-    console.error('Error initializing Firebase:', error)
+    console.error("Error initializing Firebase:", error);
+    // No inicializar Firebase si hay un error
   }
 }
 

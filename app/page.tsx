@@ -73,10 +73,21 @@ function VideoRow({ title, topics }: { title: string; topics: Topic[] }) {
 export default function Home() {
   const [topics, setTopics] = useState<Topic[]>([])
   const [loading, setLoading] = useState(true)
+  const [isClient, setIsClient] = useState(false)
 
   useEffect(() => {
+    // Marcar que estamos en el cliente
+    setIsClient(true)
+
     const fetchTopics = async () => {
       try {
+        // Verificar que db está disponible (solo en el cliente)
+        if (!db) {
+          console.error('Firestore no está disponible')
+          setLoading(false)
+          return
+        }
+        
         const topicsCollection = collection(db, 'topics')
         const topicsSnapshot = await getDocs(topicsCollection)
         const topicsList = topicsSnapshot.docs.map(doc => ({
@@ -91,9 +102,13 @@ export default function Home() {
       }
     }
 
-    fetchTopics()
+    // Solo ejecutar fetchTopics si estamos en el cliente
+    if (typeof window !== 'undefined') {
+      fetchTopics()
+    }
   }, [])
 
+  // Filtrar temas por nivel
   const basicTopics = topics.filter(topic => topic.level === 'basic')
   const intermediateTopics = topics.filter(topic => topic.level === 'intermediate')
   const advancedTopics = topics.filter(topic => topic.level === 'advanced')
@@ -157,6 +172,16 @@ export default function Home() {
                 )}
                 {advancedTopics.length > 0 && (
                   <VideoRow title="Advanced Level - Master German" topics={advancedTopics} />
+                )}
+                {topics.length === 0 && isClient && (
+                  <div className="flex items-center justify-center h-64 text-center">
+                    <div className="max-w-md">
+                      <h2 className="text-xl font-semibold mb-2">No topics available</h2>
+                      <p className="text-primary/60">
+                        Add some topics from the admin panel to get started.
+                      </p>
+                    </div>
+                  </div>
                 )}
               </>
             )}

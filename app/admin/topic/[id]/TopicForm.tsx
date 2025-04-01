@@ -53,8 +53,12 @@ export default function TopicForm({ id }: TopicFormProps) {
   const [topic, setTopic] = useState<TopicData>(emptyTopic)
   const [loading, setLoading] = useState(true)
   const [user, setUser] = useState<User | null>(null)
+  const [isClient, setIsClient] = useState(false)
 
   useEffect(() => {
+    // Mark that we're on the client
+    setIsClient(true)
+    
     // Check if we're in the browser
     if (typeof window === 'undefined') {
       return;
@@ -222,6 +226,14 @@ export default function TopicForm({ id }: TopicFormProps) {
       ...topic,
       vocabulary: topic.vocabulary.filter((_, i) => i !== index)
     })
+  }
+
+  if (!isClient) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-primary"></div>
+      </div>
+    )
   }
 
   if (loading) {
