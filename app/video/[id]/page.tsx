@@ -8,6 +8,7 @@ import { Volume2 } from 'lucide-react'
 import Image from 'next/image'
 import { useParams } from 'next/navigation'
 import React from 'react'
+import VoiceRecorder from '@/components/VoiceRecorder'
 
 type VideoData = {
   title: string
@@ -215,9 +216,12 @@ export default function VideoPage() {
                     <div key={index} className="bg-white/10 p-4 rounded-lg border border-white/5 hover:bg-white/20 transition-colors">
                       <div className="flex items-center justify-between">
                         <p className="text-lg font-medium text-white">{phrase.german}</p>
-                        {phrase.audio && phrase.audio.trim() !== '' && (
-                          <AudioButton audioUrl={phrase.audio} />
-                        )}
+                        <div className="flex flex-col items-end gap-1">
+                          {phrase.audio && phrase.audio.trim() !== '' && (
+                            <AudioButton audioUrl={phrase.audio} />
+                          )}
+                          <VoiceRecorder />
+                        </div>
                       </div>
                       <p className="text-gray-300 mt-2">{phrase.spanish}</p>
                     </div>
